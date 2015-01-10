@@ -4,13 +4,13 @@ A KISS-ier, concurrent by default Scala wrapper of [Clarity](http://github.com/s
 
 ## Usage
 
-Salve is still a new project, many things are missing (actually, only an interface to dota_combatlog is avalaible atm).
+Salve is still a new project, many things are missing (actually, only an interface to dota_combatlog is available atm).
 
 If you **really really** want to use it, you have to download the source and compile it by yourself, docs are also coming.
 
 ## YOUR CODE IS UGLY/YOU DID IT WRONG
 
-Sorry about that, I am new to scala (like seriously new) so this has to be expected, open an issue or email me to stoke95@gmail.com and I will be very happy to listen to your complaints
+Sorry about that, I am new to scala (like seriously new) so this has to be expected, open an issue or ping me at stoke95@gmail.com and I will be very happy to listen to your complaints
 
 ## Do you need help?
 
