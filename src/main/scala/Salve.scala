@@ -8,7 +8,7 @@ import akka.actor._
 import akka.event.Logging
 
 import salve.combatlog.LogEvent
-import salve.actors.{MainActor, LogCallback}
+import salve.actors.{MainActor, LogCallback, Start}
 
 class Salve(filename: String) {
   val system = ActorSystem("SalveSystem" + System.currentTimeMillis)
@@ -16,7 +16,7 @@ class Salve(filename: String) {
   val mainActor = system.actorOf(main, "mainactor")
 
   def start = {
-    mainActor ! "start"
+    mainActor ! Start(this)
   }
 
   def combatLog(f: (LogEvent) => Unit) = {
