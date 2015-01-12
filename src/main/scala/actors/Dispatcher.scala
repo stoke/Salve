@@ -5,9 +5,6 @@ import scala.reflect.ClassTag
 import akka.actor.{ActorRef, Actor}
 import salve.combatlog.{LogEntry, LogEvent}
 
-// T: LogEntry
-// A: LogEvent
-
 abstract class Dispatcher[T : ClassTag, A : ClassTag] extends Actor {
   var callbacks = new ArrayBuffer[(A) => _]
   var actors = new ArrayBuffer[ActorRef]

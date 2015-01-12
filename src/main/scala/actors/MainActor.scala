@@ -3,6 +3,7 @@ package salve.actors
 import akka.actor.{PoisonPill, Props, ActorRef, Actor}
 import akka.event.Logging
 import salve.main.Salve
+import salve.resource.PlayerResource
 
 import scala.Some
 
@@ -16,21 +17,24 @@ import skadistats.clarity.parser.TickIterator
 
 case class Start(instance: Salve)
 
-class MainActor(filename: String) extends Actor {
+class MainActor(filename: String) extends Actor with ResourcesTrait {
   val iter = Clarity.tickIteratorForFile(filename, Profile.COMBAT_LOG, Profile.ENTITIES)
   val m = new Match
   var logDescriptor: Option[GameEventDescriptor] = None
+
   val logDispatcher = context.actorOf(Props[LogDispatcherActor], "logdispatcher")
+  val resourceDispatcher = context.actorOf(Props[ResourceDispatcherActor])
 
   def receive = {
     case Start(instance) => start(instance)
     case LogCallback(f) => logDispatcher ! f
+    case ResourceCallback(f) => resourceDispatcher ! f
     case _ => {}
   }
 
   def start(salve: Salve) = {
-    iter foreach { mm =>
-      mm.apply(m)
+    iter foreach { tick =>
+      tick.apply(m)
 
       if (logDescriptor.isEmpty)
         logDescriptor = Some(m.getGameEventDescriptors.forName("dota_combatlog"))
@@ -45,6 +49,12 @@ class MainActor(filename: String) extends Actor {
 
           logDispatcher ! entry
         }
+      }
+
+      m.getEntities.getAllByDtName("DT_DOTA_PlayerResource") foreach { entity: Entity =>
+        resourceDispatcher ! entity
+
+        salve.resources = resourcesParse(entity)
       }
     }
   }
