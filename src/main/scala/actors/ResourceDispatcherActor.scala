@@ -126,8 +126,19 @@ trait ResourcesTrait {
     var i: Int = 0
 
     for (i <- i to 9) {
-      val reliableGold: Int = entry.getProperty("m_iReliableGold.000" + i)
-      val unreliableGold: Int = entry.getProperty("m_iUnreliableGold.000" + i)
+      var reliableGold: Int = 0
+      var unreliableGold: Int = 0
+
+      try {
+        reliableGold = entry.getProperty("m_iReliableGold.000" + i)
+        unreliableGold = entry.getProperty("m_iUnreliableGold.000" + i)
+      } catch {
+        case e: NullPointerException => { // Older format
+          reliableGold = if (i <= 4) entry.getProperty("m_iReliableGoldRadiant.000" + i) else entry.getProperty("DireOnlyData.m_iReliableGoldDire.000" + i)
+          unreliableGold = if (i <= 4) entry.getProperty("m_iUnreliableGoldRadiant.000" + i) else entry.getProperty("DireOnlyData.m_iUnreliableGoldDire.000" + i)
+        }
+      }
+
       val heroIdx: Int = entry.getProperty("m_nSelectedHeroID.000" + i)
 
       resources += PlayerResource(
