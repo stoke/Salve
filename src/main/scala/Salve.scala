@@ -11,7 +11,7 @@ import akka.actor._
 import akka.event.Logging
 
 import salve.combatlog.LogEvent
-import salve.actors.{ResourceCallback, MainActor, LogCallback, Start}
+import salve.actors._
 
 
 
@@ -44,6 +44,16 @@ class Salve(filename: String) {
     val instancedResourceActor = system.actorOf(actor, "resourceactor" + System.currentTimeMillis)
 
     mainActor ! ResourceCallback(instancedResourceActor)
+  }
+
+  def everyTick(f: Unit) = {
+    mainActor ! TickCallback(f)
+  }
+
+  def everyTick(actor: Props) = {
+    val instancedTickActor = system.actorOf(actor, "resourceactor" + System.currentTimeMillis)
+
+    mainActor ! TickCallback(instancedTickActor)
   }
 
   def stop = {

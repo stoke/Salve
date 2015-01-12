@@ -7,33 +7,23 @@ import salve.main.Salve
 import salve.combatlog.LogEvent
 import org.scalatest.time.SpanSugar._
 
-abstract class UnitSpec extends FlatSpec with Matchers
-
-class LogActor(w: Waiter) extends Actor with Matchers {
+class TickActor(w: Waiter) extends Actor with Matchers {
   def receive = {
-    case LogEvent(id, entry) => {
-      w {
-        entry.value shouldBe an [Integer]
-      }
-
-      w.dismiss()
-    }
-
-    case _ => {}
+    case _ => w.dismiss()
   }
 }
 
-class LogTest extends UnitSpec {
+class TickTest extends UnitSpec {
   val testReplay = getClass.getResource("/replay.dem")
   val actorWaiter = new Waiter
   val callbackWaiter = new Waiter
 
 
   "#combatLog" should "dispatch entries to the callback once started if an actor is passed" in {
-    val logActor = Props(new TickActor(actorWaiter))
+    val tickActor = Props(new TickActor(actorWaiter))
     val salve = new Salve(testReplay.getPath())
 
-    salve combatLog logActor
+    salve everyTick tickActor
 
     salve start
 
@@ -45,13 +35,7 @@ class LogTest extends UnitSpec {
   "#combatLog" should "dispatch entries to the callback once started if a block is passed" in {
     val salve = new Salve(testReplay.getPath())
 
-    salve combatLog { event: LogEvent =>
-      val entry = event.entry
-
-      callbackWaiter {
-        entry.value shouldBe an [Integer]
-      }
-
+    salve everyTick {
       callbackWaiter dismiss
     }
 

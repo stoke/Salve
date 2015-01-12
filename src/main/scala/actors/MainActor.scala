@@ -24,17 +24,21 @@ class MainActor(filename: String) extends Actor with ResourcesTrait {
 
   val logDispatcher = context.actorOf(Props[LogDispatcherActor], "logdispatcher")
   val resourceDispatcher = context.actorOf(Props[ResourceDispatcherActor])
+  val tickDispatcher = context.actorOf(Props[TickDispatcherActor])
 
   def receive = {
     case Start(instance) => start(instance)
     case LogCallback(f) => logDispatcher ! f
     case ResourceCallback(f) => resourceDispatcher ! f
+    case TickCallback(f) => tickDispatcher ! f
     case _ => {}
   }
 
   def start(salve: Salve) = {
     iter foreach { tick =>
       tick.apply(m)
+
+      tickDispatcher ! tick
 
       if (logDescriptor.isEmpty)
         logDescriptor = Some(m.getGameEventDescriptors.forName("dota_combatlog"))
